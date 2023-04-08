@@ -40,6 +40,9 @@ public class ChatServlet extends HttpServlet {
         // send the random code as the response's content
         PrintWriter out = response.getWriter();
         out.println(generatingRandomUpperAlphanumericString(5));
+        out.println("<html><body>");
+        out.println("<h1>" + message + "</h1>");
+        out.println("</body></html>");
 
     }
 

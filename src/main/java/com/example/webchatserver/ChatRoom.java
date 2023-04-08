@@ -12,8 +12,9 @@ import java.util.Map;
 public class ChatRoom {
     private String  code;
 
-    //each user has an unique ID associate to their ws session and their username
+    //each user has a unique ID associate to their ws session and their username
     private Map<String, String> users = new HashMap<String, String>() ;
+
 
     // when created the chat room has at least one user
     public ChatRoom(String code, String user){

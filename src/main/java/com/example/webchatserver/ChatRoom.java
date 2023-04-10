@@ -1,63 +1,99 @@
 package com.example.webchatserver;
 
-import java.util.ArrayList;
+
+import jakarta.websocket.*;
+import jakarta.websocket.server.PathParam;
+import jakarta.websocket.server.ServerEndpoint;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+
 /**
- * This class represents the data you may need to store about a Chat room
- * You may add more method or attributes as needed
+ * This class represents a web socket server, a new connection is created, and it receives a roomID as a parameter
  * **/
-public class ChatRoom {
-    private String  code;
+@ServerEndpoint(value="/ws/{roomID}")
+public class ChatServer {
 
-    //each user has a unique ID associate to their ws session and their username
-    private Map<String, String> users = new HashMap<String, String>() ;
+    // contains a static List of ChatRoom used to control the existing rooms and their users
+    private Map<String, String> usernames = new HashMap<String, String>();
+    private static Map<String, String> roomList = new HashMap<String, String>();
 
 
-    // when created the chat room has at least one user
-    public ChatRoom(String code, String user){
-        this.code = code;
-        // when created the user has not entered their username yet
-        this.users.put(user, "");
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }
 
-    public String getCode() {
-        return code;
-    }
+    //Handles when server is opened
+    @OnOpen
+    public void open(@PathParam("roomID") String roomID, Session session) throws IOException, EncodeException {
+        roomList.put(session.getId(), roomID);
+        System.out.println("Room joined ");
 
-    public Map<String, String> getUsers() {
-        return users;
+        session.getBasicRemote().sendText("First sample message to the client");
+//        accessing the roomID parameter
+        System.out.println(roomID);
+        session.getBasicRemote().sendText("{\"type\": \"chat\", \"message\":\" \\n Welcome to the chat room. Please state your name\"}");
+
     }
 
-    /**
-     * This method will add the new userID to the room if not exists, or it will add a new userID,name pair
-     * **/
-    public void setUserName(String userID, String name) {
-        // update the name
-        if(users.containsKey(userID)){
-            users.remove(userID);
-            users.put(userID, name);
-        }else{ // add new user
-            users.put(userID, name);
+    //handles when server is closed
+    @OnClose
+    public void close(Session session) throws IOException, EncodeException {
+
+        String userId = session.getId();
+        if(usernames.containsKey(userId))
+        {
+            String username = usernames.get(userId);
+            String roomID = roomList.get(userId);
+            usernames.remove(userId);
+            roomList.remove(roomID);
+            for( Session peer: session.getOpenSessions())
+            {
+                peer.getBasicRemote().sendText("{\"type\": \"chat\", \"message\":\" (Server): " + username + " left the chat room.\"}");
+            }
         }
     }
+    //handles when message is sent
+    @OnMessage
+    public void handleMessage(String comm, Session session, @PathParam("room") String room) throws IOException, EncodeException {
+//        example getting unique userID that sent this message
 
-    /**
-     * This method will remove a user from this room
-     * **/
-    public void removeUser(String userID){
-        if(users.containsKey(userID)){
-            users.remove(userID);
+        String userID = session.getId();
+        String roomID = roomList.get(userID); // my room
+        JSONObject jsonmsg = new JSONObject(comm);
+        String type = (String) jsonmsg.get("type");
+        String message = (String) jsonmsg.get("message");
+
+        //Check if user is part of users
+
+        if(usernames.containsKey(userID)){
+            String username = usernames.get(userID);
+
+            System.out.println(username);
+            //This is not their first message
+            for(Session peer: session.getOpenSessions()) {
+                if(roomList.get(peer.getId()).equals(roomID)) {
+                    peer.getBasicRemote().sendText("{\"type\": \"chat\", \"message\":\"(" + username + "): " + message + "\"}");
+                }
+            }
+
+        } else { //first message is their username
+            usernames.put(userID, message);
+
+            for(Session peer: session.getOpenSessions()){
+                //message to self
+                if(!peer.getId().equals(userID)){
+                    peer.getBasicRemote().sendText("{\"type\": \"chat\", \"message\":\" (Server): " + message + " joined the chat room.\"}");
+
+                }else {
+                    //broadcast to others
+                    peer.getBasicRemote().sendText("{\"type\": \"chat\", \"message\":\" (Server): Welcome, " + message + "\"}");
+                }
+
+            }
         }
 
     }
 
-    public boolean inRoom(String userID){
-        return users.containsKey(userID);
-    }
+
 }

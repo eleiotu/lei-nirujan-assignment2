@@ -1,0 +1,22 @@
+{
+  "name": "lab0809-template",
+  "version": "2.0.0",
+  "description": "Lab 8/9 for CSCI 2020U",
+  "scripts": {
+    "test": "cypress run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OntarioTech-CS-program/lab07-template.git"
+  },
+  "author": "Liam Major",
+  "license": "Nope",
+  "bugs": {
+    "url": "https://github.com/OntarioTech-CS-program/lab07-template/issues"
+  },
+  "homepage": "https://github.com/OntarioTech-CS-program/lab07-template#readme",
+  "dependencies": {
+    "cypress": "^12.5.1",
+    "rgb-hex": "^4.0.0"
+  }
+}

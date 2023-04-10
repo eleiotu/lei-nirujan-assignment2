@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "Verify test files",
+      "setup": "",
+      "run": "bash -c \"md5sum <<< \\\"$(md5sum client/cypress/e2e/*.cy.js)\\\"\"",
+      "input": "",
+      "output": "ec069c998693d4ef094267665f607155",
+      "comparison": "included",
+      "timeout": 10,
+      "points": null
+    },
+    {
+      "name": "Run website suite",
+      "setup": "(sudo apt update && sudo apt install nodejs npm && npm --prefix ./client install ./client) > /dev/null",
+      "run": "cd client && npm run test",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    }
+  ]
+}

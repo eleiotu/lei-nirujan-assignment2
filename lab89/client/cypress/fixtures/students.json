@@ -1,0 +1,34 @@
+{
+  "students": [
+    {
+      "name": "Ryan Gosling",
+      "id": 100000000,
+      "gpa": 4.3
+    },
+    {
+      "name": "Keanu Reeves",
+      "id": 100000001,
+      "gpa": 2.9
+    },
+    {
+      "name": "Richard Dean Anderson",
+      "id": 100000002,
+      "gpa": 2.7
+    },
+    {
+      "name": "Brad Pitt",
+      "id": 100000003,
+      "gpa": 3.9
+    },
+    {
+      "name": "Ed Norton",
+      "id": 100000004,
+      "gpa": 2.2
+    },
+    {
+      "name": "Helena Bonham Carter",
+      "id": 100000005,
+      "gpa": 2.0
+    }
+  ]
+}
